@@ -1,27 +1,28 @@
 /* Import Tailwind v4 core */
 @import "tailwindcss";
 
+/* 
+  NEW: Tell Tailwind v4 to activate dark mode when the .dark class 
+  is present on the HTML tag, overriding the OS default. 
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   html {
-    /* Enables smooth scrolling when navigating the app */
     scroll-behavior: smooth;
-    /* Removes the ugly blue tap-highlight box on mobile browsers */
     -webkit-tap-highlight-color: transparent; 
   }
   
   body {
-    /* Ensures fonts look crisp on all screens */
     @apply antialiased;
   }
 
-  /* Custom text selection colors to match the app theme */
   ::selection {
     @apply bg-blue-200 text-blue-900 dark:bg-blue-900/60 dark:text-blue-100;
   }
 }
 
 @layer utilities {
-  /* Custom sleek scrollbar used in the Sidebar and Main Content */
   .custom-scrollbar::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -39,7 +40,6 @@
     @apply bg-slate-400 dark:bg-slate-600;
   }
 
-  /* Mobile Safe Area Padding (Prevents the bottom navigation bar from overlapping the iPhone home indicator) */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 1.2rem);
   }

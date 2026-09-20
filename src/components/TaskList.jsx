@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskRow from './TaskRow';
 
-const TaskList = ({ tasks, activePhase, onToggleTask }) => {
+  const TaskList = ({ tasks, activePhase, onToggleTask, onUpdateNote }) => {
   // Filter tasks to only show the ones belonging to the currently selected phase
   const currentTasks = tasks.filter(task => task.phaseId === activePhase);
 
@@ -38,11 +38,11 @@ const TaskList = ({ tasks, activePhase, onToggleTask }) => {
             key={task.id} 
             task={task} 
             onToggle={onToggleTask} 
+            onUpdateNote={onUpdateNote} /* NEW: Pass to row */
           />
         ))}
       </div>
       
-      {/* End of phase indicator */}
       <div className="mt-10 mb-6 flex items-center justify-center gap-4 opacity-50">
         <div className="h-px bg-slate-300 dark:bg-slate-700 w-12" />
         <span className="text-xs font-bold text-slate-400 tracking-widest uppercase">End of Phase</span>
