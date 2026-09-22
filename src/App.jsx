@@ -13,8 +13,6 @@ const App = () => {
   const [activePhase, setActivePhase] = useState('phase1');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
-  
-  // NEW: State to track if the user has scrolled down
   const [isScrolled, setIsScrolled] = useState(false); 
   
   const [tasks, setTasks] = useLocalStorage('sde-tracker-tasks', generateTrackerData());
@@ -76,33 +74,37 @@ const App = () => {
     reader.readAsText(file);
   };
 
-  // NEW: Scroll handler
   const handleScroll = (e) => {
-    // If scrolled past 30px, toggle the compact header state
-    setIsScrolled(e.target.scrollTop > 30);
+    setIsScrolled(e.target.scrollTop > 40);
   };
 
   return (
-    <div className="flex min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 selection:bg-blue-200 dark:selection:bg-blue-900 transition-colors duration-300">
+    // FIX 1: Changed `min-h-screen` to `h-screen` and `overflow-x-hidden` to `overflow-hidden`
+    // This physically prevents the browser window itself from scrolling.
+    <div className="flex h-screen w-full max-w-[100vw] overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 selection:bg-blue-200 dark:selection:bg-blue-900 transition-colors duration-300">
       <ResponsiveNavigation activePhase={activePhase} setActivePhase={setActivePhase} phases={phasesData} />
 
-      <main className="flex-1 md:ml-72 flex flex-col min-h-screen relative w-full max-w-full min-w-0 overflow-x-hidden">
+      {/* FIX 2: Changed `min-h-screen` to `h-screen` and locked `overflow-hidden` */}
+      <main className="flex-1 md:ml-72 flex flex-col h-screen relative w-full max-w-full min-w-0 overflow-hidden">
         
-        {/* NEW: Pass the isScrolled boolean to the Header */}
+        {/* Because the `<main>` container is locked, this `<Header/>` is now permanently pinned to the top */}
         <Header 
           activePhase={activePhase} 
+          setActivePhase={setActivePhase}
           phasesData={phasesData} 
-          overallProgress={overallProgress} 
+          overallProgress={overallProgress}
           phaseProgress={phaseProgress}
           onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenAbout={() => setIsAboutOpen(true)}
           isScrolled={isScrolled} 
         />
         
-        {/* NEW: Added onScroll event listener to the scrollable container */}
-        <div onScroll={handleScroll} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar w-full min-w-0 pb-20 md:pb-6">
-          <TodayWidget tasks={tasks} onToggleTask={handleToggleTask} activePhase={activePhase} phasesData={phasesData} />
-          <TaskList tasks={tasks} activePhase={activePhase} onToggleTask={handleToggleTask} onUpdateNote={handleUpdateNote} onUpdateLinks={handleUpdateLinks} />
+        {/* FIX 3: This container handles 100% of the scrolling in the app via `overflow-y-auto` */}
+        <div onScroll={handleScroll} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar w-full min-w-0 pb-24 md:pb-6 relative pt-2">
+          <div className="max-w-3xl mx-auto w-full">
+            <TodayWidget tasks={tasks} onToggleTask={handleToggleTask} activePhase={activePhase} phasesData={phasesData} />
+            <TaskList tasks={tasks} activePhase={activePhase} onToggleTask={handleToggleTask} onUpdateNote={handleUpdateNote} onUpdateLinks={handleUpdateLinks} />
+          </div>
         </div>
 
         <input type="file" accept=".json" ref={fileInputRef} onChange={handleImportData} className="hidden" />
