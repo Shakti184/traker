@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskRow from './TaskRow';
 
-  const TaskList = ({ tasks, activePhase, onToggleTask, onUpdateNote }) => {
+  const TaskList = ({ tasks, activePhase, onToggleTask, onUpdateNote,onUpdateLinks }) => {
   // Filter tasks to only show the ones belonging to the currently selected phase
   const currentTasks = tasks.filter(task => task.phaseId === activePhase);
 
@@ -39,6 +39,7 @@ import TaskRow from './TaskRow';
             task={task} 
             onToggle={onToggleTask} 
             onUpdateNote={onUpdateNote} /* NEW: Pass to row */
+            onUpdateLinks={onUpdateLinks} /* NEW: Pass to Row */
           />
         ))}
       </div>
