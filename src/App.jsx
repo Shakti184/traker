@@ -1,4 +1,6 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useRegisterSW } from 'virtual:pwa-register/react'; 
+
 import ResponsiveNavigation from './components/ResponsiveNavigation';
 import Header from './components/Header';
 import TaskList from './components/TaskList';
@@ -18,6 +20,70 @@ const App = () => {
   const [tasks, setTasks] = useLocalStorage('sde-tracker-tasks', generateTrackerData());
   const [theme, toggleTheme] = useTheme(); 
   const fileInputRef = useRef(null);
+
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) { console.log('SW Registered'); },
+    onRegisterError(error) { console.log('SW registration error', error); }
+  });
+
+  // SMART MERGE FUNCTION: Combines new app code with saved user progress
+  const mergeUserDataWithFreshCurriculum = (userBackup) => {
+    const freshCurriculum = generateTrackerData();
+    
+    // 1. Map user progress onto the fresh curriculum
+    const mergedTasks = freshCurriculum.map(freshTask => {
+      const savedTask = userBackup.find(t => t.id === freshTask.id);
+      if (savedTask) {
+        return {
+          ...freshTask, // Keeps fresh topic, directive, and phaseId from your code updates
+          isCompleted: savedTask.isCompleted || false, // Injects user's saved progress
+          notes: savedTask.notes || '',
+          links: savedTask.links || []
+        };
+      }
+      return freshTask; // If it's a brand new task added in the update, it just passes through
+    });
+
+    // 2. Orphan Handler: Prevent data loss if you remove a task from the code that the user wrote notes on
+    const orphanedTasks = userBackup.filter(savedTask => 
+      (savedTask.isCompleted || savedTask.notes || (savedTask.links && savedTask.links.length > 0)) &&
+      !freshCurriculum.some(fresh => fresh.id === savedTask.id)
+    );
+
+    return [...mergedTasks, ...orphanedTasks];
+  };
+
+  // Automatic Backup Restoration on Boot
+  useEffect(() => {
+    const tempBackup = sessionStorage.getItem('sde_temp_backup');
+    if (tempBackup) {
+      try {
+        const parsedBackup = JSON.parse(tempBackup);
+        if (Array.isArray(parsedBackup) && parsedBackup.length > 0) {
+          
+          // Apply the smart merge before setting state
+          const smartlyMergedData = mergeUserDataWithFreshCurriculum(parsedBackup);
+          setTasks(smartlyMergedData);
+          
+          sessionStorage.removeItem('sde_temp_backup'); 
+          setTimeout(() => alert("App updated successfully! New tasks added and your progress is safe."), 500);
+        }
+      } catch (e) {
+        console.error("Failed to restore backup after update.");
+      }
+    }
+  }, [setTasks]);
+
+  const handleSafeUpdate = () => {
+    const currentData = localStorage.getItem('sde-tracker-tasks');
+    if (currentData) {
+      sessionStorage.setItem('sde_temp_backup', currentData);
+    }
+    updateServiceWorker(true);
+  };
 
   const overallProgress = useMemo(() => {
     if (!tasks || tasks.length === 0) return 0;
@@ -62,9 +128,13 @@ const App = () => {
       try {
         const importedTasks = JSON.parse(e.target.result);
         if (Array.isArray(importedTasks) && importedTasks.length > 0 && importedTasks[0].hasOwnProperty('phaseId')) {
-          setTasks(importedTasks);
+          
+          // Apply the smart merge to manually imported JSON files as well
+          const smartlyMergedData = mergeUserDataWithFreshCurriculum(importedTasks);
+          setTasks(smartlyMergedData);
+          
           setIsSettingsOpen(false);
-          alert("Progress successfully restored!");
+          alert("Progress successfully restored and synced with the latest curriculum!");
         } else alert("Invalid backup file format.");
       } catch (err) {
         alert("Failed to parse the backup file. Ensure it is a valid JSON.");
@@ -79,15 +149,11 @@ const App = () => {
   };
 
   return (
-    // FIX 1: Changed `min-h-screen` to `h-screen` and `overflow-x-hidden` to `overflow-hidden`
-    // This physically prevents the browser window itself from scrolling.
     <div className="flex h-screen w-full max-w-[100vw] overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 selection:bg-blue-200 dark:selection:bg-blue-900 transition-colors duration-300">
       <ResponsiveNavigation activePhase={activePhase} setActivePhase={setActivePhase} phases={phasesData} />
 
-      {/* FIX 2: Changed `min-h-screen` to `h-screen` and locked `overflow-hidden` */}
       <main className="flex-1 md:ml-72 flex flex-col h-screen relative w-full max-w-full min-w-0 overflow-hidden">
         
-        {/* Because the `<main>` container is locked, this `<Header/>` is now permanently pinned to the top */}
         <Header 
           activePhase={activePhase} 
           setActivePhase={setActivePhase}
@@ -99,7 +165,6 @@ const App = () => {
           isScrolled={isScrolled} 
         />
         
-        {/* FIX 3: This container handles 100% of the scrolling in the app via `overflow-y-auto` */}
         <div onScroll={handleScroll} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar w-full min-w-0 pb-24 md:pb-6 relative pt-2">
           <div className="max-w-3xl mx-auto w-full">
             <TodayWidget tasks={tasks} onToggleTask={handleToggleTask} activePhase={activePhase} phasesData={phasesData} />
@@ -110,7 +175,18 @@ const App = () => {
         <input type="file" accept=".json" ref={fileInputRef} onChange={handleImportData} className="hidden" />
       </main>
 
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onConfirmReset={handleReset} onExport={handleExportData} onTriggerImport={() => fileInputRef.current?.click()} theme={theme} onToggleTheme={toggleTheme} />
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        onConfirmReset={handleReset} 
+        onExport={handleExportData} 
+        onTriggerImport={() => fileInputRef.current?.click()} 
+        theme={theme} 
+        onToggleTheme={toggleTheme} 
+        needRefresh={needRefresh}
+        onSafeUpdate={handleSafeUpdate}
+      />
+      
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </div>
   );

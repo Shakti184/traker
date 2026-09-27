@@ -101,7 +101,7 @@ const Header = ({ activePhase, setActivePhase, phasesData, overallProgress, phas
             </div>
 
             {/* Premium Phase Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-2">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-2">
               {phasesData.map(phase => {
                 const isActive = activePhase === phase.id;
                 const prog = Math.round(phaseProgress[phase.id] || 0);
