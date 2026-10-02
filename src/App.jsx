@@ -34,6 +34,56 @@ const App = () => {
     onRegisterError(error) { console.log('SW registration error', error); }
   });
 
+  // ============================================================================
+  // PWA MOBILE HARDWARE BACK-BUTTON INTERCEPTOR
+  // ============================================================================
+  
+  useEffect(() => {
+    // Listen for the mobile hardware back button
+    const handlePopState = (e) => {
+      setFocusWriteTask(null);
+      setIsSettingsOpen(false);
+      setIsAboutOpen(false);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleOpenFocusWrite = (task) => {
+    window.history.pushState({ modal: 'focusWrite' }, '');
+    setFocusWriteTask(task);
+  };
+
+  const handleCloseFocusWrite = () => {
+    if (window.history.state?.modal) window.history.back(); // Triggers popstate
+    else setFocusWriteTask(null);
+  };
+
+  const handleOpenSettings = () => {
+    window.history.pushState({ modal: 'settings' }, '');
+    setIsSettingsOpen(true);
+  };
+
+  const handleCloseSettings = () => {
+    if (window.history.state?.modal) window.history.back();
+    else setIsSettingsOpen(false);
+  };
+
+  const handleOpenAbout = () => {
+    window.history.pushState({ modal: 'about' }, '');
+    setIsAboutOpen(true);
+  };
+
+  const handleCloseAbout = () => {
+    if (window.history.state?.modal) window.history.back();
+    else setIsAboutOpen(false);
+  };
+
+  // ============================================================================
+  // DATA MANAGEMENT & SYNC
+  // ============================================================================
+
   const mergeUserDataWithFreshCurriculum = (userBackup) => {
     const freshCurriculum = generateTrackerData();
     const mergedTasks = freshCurriculum.map(freshTask => {
@@ -98,8 +148,19 @@ const App = () => {
   }, [tasks]);
 
   const handleToggleTask = (taskId) => setTasks(prev => prev.map(task => task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task));
-  const handleUpdateNote = (taskId, noteText) => setTasks(prev => prev.map(task => task.id === taskId ? { ...task, notes: noteText } : task));
-  const handleUpdateLinks = (taskId, linksArray) => setTasks(prev => prev.map(task => task.id === taskId ? { ...task, links: linksArray } : task));
+  
+  // FIX: Also update the currently open modal state so AI Generation renders instantly
+  const handleUpdateNote = (taskId, noteText) => {
+    setTasks(prev => prev.map(task => task.id === taskId ? { ...task, notes: noteText } : task));
+    setFocusWriteTask(prev => (prev && prev.id === taskId) ? { ...prev, notes: noteText } : prev);
+  };
+  
+  // FIX: Keep links perfectly in sync for the active modal
+  const handleUpdateLinks = (taskId, linksArray) => {
+    setTasks(prev => prev.map(task => task.id === taskId ? { ...task, links: linksArray } : task));
+    setFocusWriteTask(prev => (prev && prev.id === taskId) ? { ...prev, links: linksArray } : prev);
+  };
+  
   const handleReset = () => setTasks(generateTrackerData());
 
   const handleExportData = () => {
@@ -130,7 +191,7 @@ const App = () => {
         const importedTasks = JSON.parse(e.target.result);
         if (Array.isArray(importedTasks) && importedTasks.length > 0 && importedTasks[0].hasOwnProperty('phaseId')) {
           setTasks(mergeUserDataWithFreshCurriculum(importedTasks));
-          setIsSettingsOpen(false);
+          handleCloseSettings();
           
           setSysNotification({
             type: 'success',
@@ -187,17 +248,15 @@ const App = () => {
             phasesData={phasesData}
             overallProgress={overallProgress}
             phaseProgress={phaseProgress}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onOpenAbout={() => setIsAboutOpen(true)}
+            onOpenSettings={handleOpenSettings}
+            onOpenAbout={handleOpenAbout}
             isScrolled={isScrolled}
           />
 
           <div className="relative flex-1 flex flex-col min-h-0 overflow-hidden">
             
-            {/* UPDATED: Increased Fade Zone height (h-12 / md:h-16) for much more breathing room */}
             <div className="absolute top-0 left-0 right-0 h-12 md:h-16 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
 
-            {/* UPDATED: Increased top padding (pt-8 / md:pt-10) to match the taller fade zone */}
             <div
               onScroll={handleScroll}
               className="custom-scrollbar relative flex-1 overflow-x-hidden overflow-y-auto px-3 pb-24 pt-8 sm:px-5 md:pt-10 md:px-8 md:pb-8 lg:px-10"
@@ -209,7 +268,7 @@ const App = () => {
                     onToggleTask={handleToggleTask}
                     activePhase={activePhase}
                     phasesData={phasesData}
-                    onOpenFocusWrite={(task) => setFocusWriteTask(task)}
+                    onOpenFocusWrite={handleOpenFocusWrite}
                   />
 
                   <TaskList
@@ -218,7 +277,7 @@ const App = () => {
                     onToggleTask={handleToggleTask}
                     onUpdateNote={handleUpdateNote}
                     onUpdateLinks={handleUpdateLinks}
-                    onOpenFocusWrite={(task) => setFocusWriteTask(task)}
+                    onOpenFocusWrite={handleOpenFocusWrite}
                   />
                 </div>
               </div>
@@ -239,14 +298,14 @@ const App = () => {
       <FocusWriteMode 
         task={focusWriteTask} 
         isOpen={!!focusWriteTask} 
-        onClose={() => setFocusWriteTask(null)} 
+        onClose={handleCloseFocusWrite} 
         onUpdateNote={handleUpdateNote} 
         onUpdateLinks={handleUpdateLinks} 
       />
 
       <SettingsModal
         isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+        onClose={handleCloseSettings}
         onConfirmReset={handleReset}
         onExport={handleExportData}
         onTriggerImport={() => fileInputRef.current?.click()}
@@ -258,7 +317,7 @@ const App = () => {
 
       <AboutModal
         isOpen={isAboutOpen}
-        onClose={() => setIsAboutOpen(false)}
+        onClose={handleCloseAbout}
       />
 
       {sysNotification && (
