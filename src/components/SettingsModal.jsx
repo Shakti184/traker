@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const SettingsModal = ({ isOpen, onClose, onConfirmReset, onExport, onTriggerImport, theme, onToggleTheme, needRefresh, onSafeUpdate }) => {
   const [showResetWarning, setShowResetWarning] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [isKeySaved, setIsKeySaved] = useState(false);
+
+  // Load the API key from local storage when the modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const storedKey = localStorage.getItem('gemini_api_key');
+      if (storedKey) {
+        setApiKey(storedKey);
+      }
+      setShowResetWarning(false);
+      setIsKeySaved(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const handleSaveApiKey = () => {
+    localStorage.setItem('gemini_api_key', apiKey.trim());
+    setIsKeySaved(true);
+    setTimeout(() => setIsKeySaved(false), 2000);
+  };
 
   return (
     <>
@@ -57,6 +77,41 @@ const SettingsModal = ({ isOpen, onClose, onConfirmReset, onExport, onTriggerImp
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
+              </div>
+            </div>
+
+            {/* AI Configuration Section */}
+            <div className="mb-8">
+              <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-3">AI Configuration</h3>
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Gemini API Key</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Required to generate smart study notes</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <input 
+                    type="password" 
+                    value={apiKey} 
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="AIzaSy..." 
+                    className="flex-1 px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 text-slate-800 dark:text-slate-200 transition-all shadow-sm"
+                  />
+                  <button 
+                    onClick={handleSaveApiKey}
+                    className="px-4 py-2 bg-slate-800 dark:bg-slate-700 text-white text-sm font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors shadow-sm active:scale-95 whitespace-nowrap"
+                  >
+                    {isKeySaved ? 'Saved!' : 'Save'}
+                  </button>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-2 leading-relaxed">
+                  Your key is stored securely in your browser's local storage and is never sent to any server other than Google.
+                </p>
               </div>
             </div>
 
