@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
+import { useRegisterSW } from 'virtual:pwa-register/react'; 
 
 import ResponsiveNavigation from './components/ResponsiveNavigation';
 import Header from './components/Header';
@@ -7,8 +7,9 @@ import TaskList from './components/TaskList';
 import SettingsModal from './components/SettingsModal';
 import AboutModal from './components/AboutModal';
 import TodayWidget from './components/TodayWidget';
-import useLocalStorage from './hooks/useLocalStorage';
-import FocusWriteMode from './components/FocusWriteMode';
+import FocusWriteMode from './components/FocusWriteMode'; 
+
+import useIndexedDB from './hooks/useIndexedDB'; 
 import useTheme from './hooks/useTheme';
 import { phasesData, generateTrackerData } from './data/scheduleData';
 
@@ -16,26 +17,23 @@ const App = () => {
   const [activePhase, setActivePhase] = useState('phase1');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [focusWriteTask, setFocusWriteTask] = useState(null);
-  const [tasks, setTasks] = useLocalStorage('sde-tracker-tasks', generateTrackerData());
+  const [isScrolled, setIsScrolled] = useState(false); 
+  const [focusWriteTask, setFocusWriteTask] = useState(null); 
   const [sysNotification, setSysNotification] = useState(null);
-  const [theme, toggleTheme] = useTheme();
+  
+  const [tasks, setTasks, isDbLoaded] = useIndexedDB('sde-tracker-tasks', generateTrackerData());
+  
+  const [theme, toggleTheme] = useTheme(); 
   const fileInputRef = useRef(null);
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegistered(r) {
-      console.log('SW Registered');
-    },
-    onRegisterError(error) {
-      console.log('SW registration error', error);
-    },
+    onRegistered(r) { console.log('SW Registered'); },
+    onRegisterError(error) { console.log('SW registration error', error); }
   });
 
-  // SMART MERGE FUNCTION: Combines new app code with saved user progress
   const mergeUserDataWithFreshCurriculum = (userBackup) => {
     const freshCurriculum = generateTrackerData();
     const mergedTasks = freshCurriculum.map(freshTask => {
@@ -59,11 +57,9 @@ const App = () => {
     return [...mergedTasks, ...orphanedTasks];
   };
 
-  // Automatic Backup Restoration on Boot
   useEffect(() => {
     const tempBackup = sessionStorage.getItem('sde_temp_backup');
-
-    if (tempBackup) {
+    if (tempBackup && isDbLoaded) {
       try {
         const parsedBackup = JSON.parse(tempBackup);
         if (Array.isArray(parsedBackup) && parsedBackup.length > 0) {
@@ -75,64 +71,35 @@ const App = () => {
         console.error("Failed to restore backup after update.");
       }
     }
-  }, [setTasks]);
+  }, [setTasks, isDbLoaded]);
 
   const handleSafeUpdate = () => {
-    const currentData = localStorage.getItem('sde-tracker-tasks');
-
-    if (currentData) {
-      sessionStorage.setItem('sde_temp_backup', currentData);
+    if (tasks && tasks.length > 0) {
+      sessionStorage.setItem('sde_temp_backup', JSON.stringify(tasks));
     }
-
     updateServiceWorker(true);
   };
 
   const overallProgress = useMemo(() => {
     if (!tasks || tasks.length === 0) return 0;
-
-    const completed = tasks.filter((t) => t.isCompleted).length;
+    const completed = tasks.filter(t => t.isCompleted).length;
     return (completed / tasks.length) * 100;
   }, [tasks]);
 
   const phaseProgress = useMemo(() => {
     if (!tasks || tasks.length === 0) return {};
-
     const progressMap = {};
-
-    phasesData.forEach((phase) => {
-      const phaseTasks = tasks.filter((t) => t.phaseId === phase.id);
-      const completed = phaseTasks.filter((t) => t.isCompleted).length;
-
-      progressMap[phase.id] =
-        phaseTasks.length > 0 ? (completed / phaseTasks.length) * 100 : 0;
+    phasesData.forEach(phase => {
+      const phaseTasks = tasks.filter(t => t.phaseId === phase.id);
+      const completed = phaseTasks.filter(t => t.isCompleted).length;
+      progressMap[phase.id] = phaseTasks.length > 0 ? (completed / phaseTasks.length) * 100 : 0;
     });
-
     return progressMap;
   }, [tasks]);
 
-  const handleToggleTask = (taskId) =>
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId
-          ? { ...task, isCompleted: !task.isCompleted }
-          : task
-      )
-    );
-
-  const handleUpdateNote = (taskId, noteText) =>
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, notes: noteText } : task
-      )
-    );
-
-  const handleUpdateLinks = (taskId, linksArray) =>
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, links: linksArray } : task
-      )
-    );
-
+  const handleToggleTask = (taskId) => setTasks(prev => prev.map(task => task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task));
+  const handleUpdateNote = (taskId, noteText) => setTasks(prev => prev.map(task => task.id === taskId ? { ...task, notes: noteText } : task));
+  const handleUpdateLinks = (taskId, linksArray) => setTasks(prev => prev.map(task => task.id === taskId ? { ...task, links: linksArray } : task));
   const handleReset = () => setTasks(generateTrackerData());
 
   const handleExportData = () => {
@@ -147,7 +114,6 @@ const App = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    // Trigger Success Modal
     setSysNotification({
       type: 'success',
       title: 'Backup Saved!',
@@ -164,9 +130,8 @@ const App = () => {
         const importedTasks = JSON.parse(e.target.result);
         if (Array.isArray(importedTasks) && importedTasks.length > 0 && importedTasks[0].hasOwnProperty('phaseId')) {
           setTasks(mergeUserDataWithFreshCurriculum(importedTasks));
-          setIsSettingsOpen(false); // Close settings menu
+          setIsSettingsOpen(false);
           
-          // Trigger Success Modal
           setSysNotification({
             type: 'success',
             title: 'Data Restored!',
@@ -183,13 +148,22 @@ const App = () => {
     reader.readAsText(file);
   };
 
-  const handleScroll = (e) => {
-    setIsScrolled(e.target.scrollTop > 40);
-  };
+  const handleScroll = (e) => setIsScrolled(e.target.scrollTop > 40);
+
+  if (!isDbLoaded) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin dark:border-indigo-900/50 dark:border-t-indigo-500" />
+          <p className="text-sm font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase animate-pulse">Loading Workspace...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex h-screen w-full max-w-[100vw] overflow-hidden bg-slate-50 font-sans text-slate-900 transition-colors duration-500 dark:bg-slate-950 dark:text-slate-100 selection:bg-blue-200 dark:selection:bg-blue-900">
-      {/* Premium ambient background — visual only */}
+      
       <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
         <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-500/10" />
         <div className="absolute right-0 top-1/3 h-[28rem] w-[28rem] rounded-full bg-indigo-400/10 blur-3xl dark:bg-indigo-500/10" />
@@ -204,7 +178,7 @@ const App = () => {
         />
 
         <main className="relative flex h-screen min-w-0 flex-1 flex-col overflow-hidden md:ml-72">
-          {/* Soft content-shell edge for desktop */}
+          
           <div className="pointer-events-none absolute inset-y-0 left-0 z-20 hidden w-px bg-slate-200/70 dark:bg-slate-800/70 md:block" />
 
           <Header
@@ -218,28 +192,35 @@ const App = () => {
             isScrolled={isScrolled}
           />
 
-          <div
-            onScroll={handleScroll}
-            className="custom-scrollbar relative flex-1 overflow-x-hidden overflow-y-auto px-3 pb-24 pt-3 sm:px-5 md:px-8 md:pb-8 lg:px-10"
-          >
-            <div className="mx-auto w-full max-w-4xl">
-              <div className="space-y-5 sm:space-y-6">
-                <TodayWidget
-                  tasks={tasks}
-                  onToggleTask={handleToggleTask}
-                  activePhase={activePhase}
-                  phasesData={phasesData}
-                  onOpenFocusWrite={(task) => setFocusWriteTask(task)}
-                />
+          <div className="relative flex-1 flex flex-col min-h-0 overflow-hidden">
+            
+            {/* UPDATED: Increased Fade Zone height (h-12 / md:h-16) for much more breathing room */}
+            <div className="absolute top-0 left-0 right-0 h-12 md:h-16 bg-gradient-to-b from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
 
-                <TaskList
-                  tasks={tasks}
-                  activePhase={activePhase}
-                  onToggleTask={handleToggleTask}
-                  onUpdateNote={handleUpdateNote}
-                  onUpdateLinks={handleUpdateLinks}
-                  onOpenFocusWrite={(task) => setFocusWriteTask(task)}
-                />
+            {/* UPDATED: Increased top padding (pt-8 / md:pt-10) to match the taller fade zone */}
+            <div
+              onScroll={handleScroll}
+              className="custom-scrollbar relative flex-1 overflow-x-hidden overflow-y-auto px-3 pb-24 pt-8 sm:px-5 md:pt-10 md:px-8 md:pb-8 lg:px-10"
+            >
+              <div className="mx-auto w-full max-w-4xl">
+                <div className="space-y-5 sm:space-y-6">
+                  <TodayWidget
+                    tasks={tasks}
+                    onToggleTask={handleToggleTask}
+                    activePhase={activePhase}
+                    phasesData={phasesData}
+                    onOpenFocusWrite={(task) => setFocusWriteTask(task)}
+                  />
+
+                  <TaskList
+                    tasks={tasks}
+                    activePhase={activePhase}
+                    onToggleTask={handleToggleTask}
+                    onUpdateNote={handleUpdateNote}
+                    onUpdateLinks={handleUpdateLinks}
+                    onOpenFocusWrite={(task) => setFocusWriteTask(task)}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -254,6 +235,7 @@ const App = () => {
         </main>
         
       </div>
+
       <FocusWriteMode 
         task={focusWriteTask} 
         isOpen={!!focusWriteTask} 
@@ -261,6 +243,7 @@ const App = () => {
         onUpdateNote={handleUpdateNote} 
         onUpdateLinks={handleUpdateLinks} 
       />
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -277,7 +260,7 @@ const App = () => {
         isOpen={isAboutOpen}
         onClose={() => setIsAboutOpen(false)}
       />
-      {/* NEW: Global System Notification Modal */}
+
       {sysNotification && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md animate-fade-in">
           <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[24px] shadow-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center animate-fade-in-up">

@@ -5,7 +5,8 @@ const TaskRow = React.memo(({ task, onToggle, onOpenFocusWrite }) => {
   const [isReadModalOpen, setIsReadModalOpen] = useState(false);
   const links = task.links || [];
 
-  const handleRowClick = () => {
+  const handleRowClick = (e) => {
+    e.stopPropagation();
     onToggle(task.id);
   };
 
@@ -38,9 +39,14 @@ const TaskRow = React.memo(({ task, onToggle, onOpenFocusWrite }) => {
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-blue-50/50 opacity-0 group-hover:opacity-100 dark:from-indigo-900/10 dark:to-blue-900/10 transition-opacity duration-500 pointer-events-none" />
         )}
 
-        <div onClick={handleRowClick} className="flex items-start gap-3 md:gap-5 cursor-pointer relative z-10 w-full max-w-full min-w-0">
+        {/* REMOVED onClick and cursor-pointer from this container */}
+        <div className="flex items-start gap-3 md:gap-5 relative z-10 w-full max-w-full min-w-0">
           
-          <div className="relative flex-shrink-0 mt-1 md:mt-1.5">
+          {/* ADDED onClick, cursor-pointer, and active:scale-90 to the checkbox wrapper only */}
+          <div 
+            onClick={handleRowClick} 
+            className="relative flex-shrink-0 mt-1 md:mt-1.5 cursor-pointer hover:scale-105 active:scale-90 transition-transform duration-200"
+          >
             <div className={`w-7 h-7 md:w-8 md:h-8 rounded-xl border-2 flex items-center justify-center transition-all duration-500 ease-out
               ${task.isCompleted 
                 ? 'bg-gradient-to-br from-indigo-500 to-blue-600 border-transparent shadow-[0_0_12px_rgba(99,102,241,0.4)] scale-95' 
