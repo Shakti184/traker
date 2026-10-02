@@ -179,3 +179,30 @@ pre {
     animation: none;
   }
 }
+@layer base {
+  /* Targets any table inside a container with the 'rich-text' class */
+  .rich-text table {
+    @apply block w-full overflow-x-auto border-collapse my-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  .rich-text thead {
+    @apply bg-slate-100 dark:bg-slate-800/80 border-b-2 border-slate-200 dark:border-slate-700;
+  }
+  
+  .rich-text th {
+    @apply px-4 py-3.5 font-extrabold text-slate-800 dark:text-slate-200 text-left border-r border-slate-200 dark:border-slate-700 last:border-r-0 whitespace-nowrap;
+  }
+  
+  .rich-text td {
+    @apply px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-b border-slate-200 dark:border-slate-700 last:border-r-0 align-top min-w-[180px];
+  }
+  
+  .rich-text tr:last-child td {
+    @apply border-b-0;
+  }
+  
+  .rich-text tr:nth-child(even) {
+    @apply bg-slate-50/50 dark:bg-slate-900/30;
+  }
+}
