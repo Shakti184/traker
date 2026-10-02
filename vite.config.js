@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'logo-512.png', 'masked-icon.svg'],
       manifest: {
         name: 'SDE Tracker',
         short_name: 'Tracker',
@@ -18,17 +18,18 @@ export default defineConfig({
         background_color: '#f8fafc',
         display: 'standalone', // Makes it look like a native app without browser borders
         icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
+    {
+      src: '/logo-192.png',
+      sizes: '192x192',
+      type: 'image/png',
+      purpose: 'any maskable'
+    },
+    {
+      src: '/logo-512.png',
+      sizes: '512x512',
+      type: 'image/png'
+    }
+  ]
       },
       workbox: {
         // This is the magic configuration that caches your entire UI for offline use
