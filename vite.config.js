@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'logo-512.png', 'masked-icon.svg'],
+      includeAssets: [ 'logo-512.png'],
       manifest: {
         name: 'SDE Tracker',
         short_name: 'Tracker',
@@ -18,12 +18,6 @@ export default defineConfig({
         background_color: '#f8fafc',
         display: 'standalone', // Makes it look like a native app without browser borders
         icons: [
-    {
-      src: '/logo-192.png',
-      sizes: '192x192',
-      type: 'image/png',
-      purpose: 'any maskable'
-    },
     {
       src: '/logo-512.png',
       sizes: '512x512',
