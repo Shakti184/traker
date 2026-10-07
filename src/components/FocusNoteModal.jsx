@@ -35,7 +35,7 @@ const SUPPORTED_HIGHLIGHT_LANGUAGES = new Set([
   'bash', 'c', 'cpp', 'csharp', 'css', 'diff', 'docker', 'go', 'graphql',
   'html', 'java', 'javascript', 'json', 'kotlin', 'markdown', 'php',
   'powershell', 'python', 'ruby', 'rust', 'scss', 'shell', 'sql', 'swift',
-  'text', 'typescript', 'xml', 'yaml',
+  'text', 'typescript', 'xml', 'yaml','mermaid',
 ]);
 
 const normalizeLanguage = (language) => {
