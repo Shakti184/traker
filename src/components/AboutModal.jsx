@@ -4,243 +4,161 @@ const AboutModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md transition-all duration-300">
 
-      {/* Modal */}
-      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white shadow-2xl dark:border-slate-700/60 dark:bg-slate-950">
+      {/* Modal Container */}
+      <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[28px] md:rounded-[32px] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_24px_60px_-12px_rgba(0,0,0,0.8)] border border-slate-100 dark:border-slate-800 flex flex-col animate-[scale-in_0.25s_ease-out] overflow-hidden relative">
 
-        {/* Top gradient accent */}
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+        {/* Decorative Top Gradient Line */}
+        <div className="absolute inset-x-0 top-0 z-20 h-[3px] bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-400 opacity-80" />
 
-        {/* Decorative glow */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl" />
+        {/* Ambient Background Glows */}
+        <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl" />
 
-        {/* Header */}
-        <div className="relative flex items-center justify-between border-b border-slate-200/80 bg-white/80 px-6 py-5 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/80">
-
-          <div className="flex items-center gap-3">
-
-            {/* Info icon */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
-              <svg
-                className="h-5 w-5 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+        {/* =========================================================
+            PREMIUM HEADER
+        ========================================================= */}
+        <div className="relative flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-xl shrink-0 z-10">
+          <div className="flex items-center gap-3.5">
+            <div className="flex shrink-0 items-center justify-center w-11 h-11 rounded-[14px] bg-gradient-to-br from-indigo-500 via-blue-600 to-cyan-500 text-white shadow-md shadow-indigo-500/20 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
+              <svg className="w-5 h-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-
             <div>
-              <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-lg md:text-xl font-extrabold text-slate-800 dark:text-white leading-tight tracking-tight">
                 About Tracker
-              </h3>
-
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Product information
+              </h2>
+              <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500 mt-0.5">
+                System Information
               </p>
             </div>
           </div>
 
-          {/* Close */}
           <button
             onClick={onClose}
-            className="group flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
+            className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-slate-200/80 bg-white text-slate-400 transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 shadow-sm dark:border-slate-700/80 dark:bg-slate-800 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-white active:scale-95"
           >
-            <svg
-              className="h-4 w-4 transition-transform duration-200 group-hover:rotate-90"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="relative px-6 py-7">
+        {/* =========================================================
+            SCROLLABLE CONTENT BODY
+        ========================================================= */}
+        <div className="relative px-6 py-8 overflow-y-auto custom-scrollbar max-h-[75vh] z-10">
 
-          {/* Product Icon */}
-          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 shadow-xl shadow-indigo-500/20">
+          {/* Product Hero */}
+          <div className="text-center mb-8">
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-[20px] bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-700 dark:to-slate-800 shadow-lg shadow-slate-900/20 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 pointer-events-none" />
+              <svg className="h-10 w-10 text-white relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
 
-            <svg
-              className="h-10 w-10 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.7}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-
-          {/* Product Name */}
-          <div className="text-center">
-
-            <h4 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h4 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2">
               SDE-2 Blueprint
             </h4>
 
-            <div className="mt-2 flex items-center justify-center gap-2">
-
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                Version 1.0
+            <div className="flex items-center justify-center gap-2">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-emerald-700 dark:text-emerald-400">System Active</span>
               </span>
-
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
-
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                Active
+              <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                Version 1.0.0
               </span>
             </div>
           </div>
 
-          {/* Description */}
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-800 dark:bg-slate-900/60">
-
-            <div className="mb-3 flex items-center gap-2">
-
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-                <svg
-                  className="h-3.5 w-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
+          {/* Target Use Case Card */}
+          <div className="mb-6 rounded-[20px] border border-indigo-100 dark:border-indigo-500/20 bg-gradient-to-br from-indigo-50/50 to-blue-50/30 p-5 dark:from-indigo-500/5 dark:to-blue-500/5 shadow-sm">
+            <div className="mb-2.5 flex items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-[10px] bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 shadow-sm">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
               </div>
-
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                What is this?
+              <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
+                Target Use Case
               </span>
             </div>
-
-            <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">
-              A 16-week intensive study architecture designed to help
-              backend engineers transition into product-based SDE-2 roles.
-              Track your preparation, organize study material, and practice
-              with structured mock interviews.
+            <p className="text-[13px] md:text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-medium">
+              Designed exclusively for software engineers targeting <strong>SDE-2 and Senior Backend</strong> roles at top-tier product companies. This platform transforms scattered preparation into a unified, highly-focused execution roadmap.
             </p>
           </div>
 
-          {/* Feature Pills */}
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          {/* How It Works Section */}
+          <div className="mb-8">
+            <h3 className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 mb-3 pl-2">
+              How the System Works
+            </h3>
+            
+            <div className="flex flex-col gap-3">
+              {/* Feature 1 */}
+              <div className="flex items-start gap-3.5 p-4 rounded-[16px] bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 transition-all hover:border-indigo-200 dark:hover:border-indigo-500/30">
+                <div className="flex shrink-0 h-8 w-8 items-center justify-center rounded-xl bg-white dark:bg-slate-900 shadow-sm text-blue-500">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-white">Curated Execution Tracks</h4>
+                  <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Follow a systematic curriculum spanning DSA, System Design, Backend Architecture, and Cloud Infrastructure.</p>
+                </div>
+              </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white px-2 py-3 text-center dark:border-slate-800 dark:bg-slate-900">
-              <svg
-                className="mx-auto mb-1.5 h-4 w-4 text-blue-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              {/* Feature 2 */}
+              <div className="flex items-start gap-3.5 p-4 rounded-[16px] bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 transition-all hover:border-indigo-200 dark:hover:border-indigo-500/30">
+                <div className="flex shrink-0 h-8 w-8 items-center justify-center rounded-xl bg-white dark:bg-slate-900 shadow-sm text-indigo-500">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-white">Deep Focus Workspaces</h4>
+                  <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Utilize built-in Pomodoro timers and distraction-free "Focus Write" and "Read" modes to combat context-switching.</p>
+                </div>
+              </div>
 
-              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                16 Weeks
-              </span>
+              {/* Feature 3 */}
+              <div className="flex items-start gap-3.5 p-4 rounded-[16px] bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 transition-all hover:border-indigo-200 dark:hover:border-indigo-500/30">
+                <div className="flex shrink-0 h-8 w-8 items-center justify-center rounded-xl bg-white dark:bg-slate-900 shadow-sm text-cyan-500">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-white">AI-Powered Engineering Notes</h4>
+                  <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Instantly generate rich Markdown notes, Mermaid architecture diagrams, and LaTeX math formulas using the integrated Gemini AI.</p>
+                </div>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="flex items-start gap-3.5 p-4 rounded-[16px] bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 transition-all hover:border-indigo-200 dark:hover:border-indigo-500/30">
+                <div className="flex shrink-0 h-8 w-8 items-center justify-center rounded-xl bg-white dark:bg-slate-900 shadow-sm text-emerald-500">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-white">100% Local & Secure</h4>
+                  <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">No databases. No tracking. Your progress, custom tasks, notes, and API keys are stored securely in your browser's local storage.</p>
+                </div>
+              </div>
             </div>
-
-            <div className="rounded-xl border border-slate-200 bg-white px-2 py-3 text-center dark:border-slate-800 dark:bg-slate-900">
-              <svg
-                className="mx-auto mb-1.5 h-4 w-4 text-indigo-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M4 6h16M4 12h16M4 18h10"
-                />
-              </svg>
-
-              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                Study Space
-              </span>
-            </div>
-
-            <div className="rounded-xl border border-slate-200 bg-white px-2 py-3 text-center dark:border-slate-800 dark:bg-slate-900">
-              <svg
-                className="mx-auto mb-1.5 h-4 w-4 text-violet-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-
-              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                Mock Interviews
-              </span>
-            </div>
-
           </div>
 
-          {/* Close Button */}
+          {/* Action Button */}
           <button
             onClick={onClose}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:from-blue-500 hover:to-indigo-500 hover:shadow-xl hover:shadow-blue-500/25 active:translate-y-0"
+            className="w-full flex items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r from-indigo-500 via-blue-600 to-cyan-500 py-3.5 text-sm font-bold text-white shadow-[0_8px_20px_-6px_rgba(99,102,241,0.5)] transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
           >
-            Done
-
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 12h14m-6-6l6 6-6 6"
-              />
-            </svg>
+            Return to Dashboard
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m-6-6l6 6-6 6" /></svg>
           </button>
 
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-          <p className="text-center text-[10px] font-medium tracking-wide text-slate-400">
-            SDE-2 Blueprint • Built for focused preparation
+        <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-4 dark:border-slate-800/80 dark:bg-slate-900/50 z-10 shrink-0">
+          <p className="text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            Built for focused preparation
           </p>
         </div>
 
@@ -250,4 +168,3 @@ const AboutModal = ({ isOpen, onClose }) => {
 };
 
 export default AboutModal;
-

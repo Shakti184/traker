@@ -2,27 +2,31 @@
    Component behavior and application logic remain unchanged. */
 
 :root {
-  --app-radius: 1rem;
-  --app-radius-lg: 1.5rem;
-  --app-border: rgb(226 232 240 / 0.85);
+  --app-radius: 1.5rem;
+  --app-border: rgb(226 232 240 / 0.8);
   --app-muted: rgb(100 116 139);
   --app-surface: rgb(255 255 255);
   --app-surface-soft: rgb(248 250 252);
-  --app-primary: rgb(37 99 235);
-  --app-primary-dark: rgb(29 78 216);
+  /* Updated to new Indigo Theme */
+  --app-primary: rgb(99 102 241);      /* Indigo-500 */
+  --app-primary-dark: rgb(79 70 229);  /* Indigo-600 */
 }
 
 .dark {
-  --app-border: rgb(51 65 85 / 0.75);
+  --app-border: rgb(51 65 85 / 0.8);
   --app-muted: rgb(148 163 184);
-  --app-surface: rgb(15 23 42);
-  --app-surface-soft: rgb(2 6 23);
+  --app-surface: rgb(15 23 42);        /* Slate-900 */
+  --app-surface-soft: rgb(2 6 23);     /* Slate-950 */
+  --app-primary: rgb(129 140 248);     /* Indigo-400 */
+  --app-primary-dark: rgb(99 102 241); /* Indigo-500 */
 }
 
 /* Smooth page-level rendering without imposing a layout on components. */
-.app,
-#root {
+.app {
   isolation: isolate;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 button {
@@ -44,10 +48,10 @@ textarea,
 select {
   color-scheme: light;
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .dark input,
@@ -59,6 +63,11 @@ select {
 input::placeholder,
 textarea::placeholder {
   color: rgb(148 163 184 / 0.85);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: rgb(100 116 139 / 0.85);
 }
 
 input:focus,
@@ -79,130 +88,10 @@ pre {
   max-width: 100%;
 }
 
-/* Reusable polished scrollbar for elements that opt into it. */
-.app-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(203 213 225 / 0.8) transparent;
-}
-
-.app-scroll::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.app-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.app-scroll::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgb(203 213 225 / 0.8);
-}
-
-.app-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgb(148 163 184 / 0.9);
-}
-
-.dark .app-scroll {
-  scrollbar-color: rgb(71 85 105 / 0.8) transparent;
-}
-
-.dark .app-scroll::-webkit-scrollbar-thumb {
-  background: rgb(71 85 105 / 0.8);
-}
-
-.dark .app-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgb(100 116 139 / 0.9);
-}
-
-/* Markdown / editor presentation. */
-.markdown-preview {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.markdown-preview pre {
-  border: 1px solid rgb(226 232 240 / 0.8);
-  border-radius: 0.875rem;
-  background: rgb(248 250 252 / 0.9);
-  padding: 1rem;
-  overflow-x: auto;
-}
-
-.dark .markdown-preview pre {
-  border-color: rgb(51 65 85 / 0.8);
-  background: rgb(2 6 23 / 0.75);
-}
-
-.markdown-preview code {
-  overflow-wrap: anywhere;
-}
-
-.markdown-preview table {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-  border-collapse: collapse;
-}
-
-.markdown-preview img {
-  height: auto;
-  border-radius: 0.875rem;
-}
-
-/* Subtle premium entrance animation used by expanding UI. */
-@keyframes appFadeInUp {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0) scale(0.99);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-.app-fade-in-up {
-  animation: appFadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@media (max-width: 640px) {
-  .markdown-preview pre {
-    border-radius: 0.75rem;
-    padding: 0.75rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-fade-in-up {
-    animation: none;
-  }
-}
-@layer base {
-  /* Targets any table inside a container with the 'rich-text' class */
-  .rich-text table {
-    @apply block w-full overflow-x-auto border-collapse my-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  }
-  
-  .rich-text thead {
-    @apply bg-slate-100 dark:bg-slate-800/80 border-b-2 border-slate-200 dark:border-slate-700;
-  }
-  
-  .rich-text th {
-    @apply px-4 py-3.5 font-extrabold text-slate-800 dark:text-slate-200 text-left border-r border-slate-200 dark:border-slate-700 last:border-r-0 whitespace-nowrap;
-  }
-  
-  .rich-text td {
-    @apply px-4 py-3 text-slate-700 dark:text-slate-300 border-r border-b border-slate-200 dark:border-slate-700 last:border-r-0 align-top min-w-[180px];
-  }
-  
-  .rich-text tr:last-child td {
-    @apply border-b-0;
-  }
-  
-  .rich-text tr:nth-child(even) {
-    @apply bg-slate-50/50 dark:bg-slate-900/30;
-  }
+/* Hardware acceleration for glassmorphic elements to prevent flickering on mobile */
+.glass-surface, 
+.backdrop-blur-md,
+.backdrop-blur-xl {
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0);
 }
